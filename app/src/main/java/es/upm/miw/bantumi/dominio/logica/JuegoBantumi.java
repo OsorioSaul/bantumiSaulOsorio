@@ -204,8 +204,12 @@ public class JuegoBantumi {
      * @return juego serializado
      */
     public String serializa() {
-        // @TODO
-        return null;
+        StringBuilder estadoDelJuego = new StringBuilder();
+        for(int i=0;i<NUM_POSICIONES;i++) {
+            estadoDelJuego.append(bantumiVM.getNumSemillas(i).getValue());
+        }
+        estadoDelJuego.append("\n").append(bantumiVM.getTurno().getValue());
+        return estadoDelJuego.toString();
     }
 
     /**

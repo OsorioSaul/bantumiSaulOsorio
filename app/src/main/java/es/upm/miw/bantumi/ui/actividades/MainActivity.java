@@ -1,12 +1,14 @@
 package es.upm.miw.bantumi.ui.actividades;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -19,6 +21,9 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.Locale;
 
 import es.upm.miw.bantumi.ui.fragmentos.FinalAlertDialog;
@@ -142,7 +147,20 @@ public class MainActivity extends AppCompatActivity {
                 return true;
 
             // @TODO!!! resto opciones
-
+            case R.id.opcGuardarPartida:
+                try {
+                    FileOutputStream fos = openFileOutput("partida.txt", Context.MODE_APPEND);
+                    fos.write(juegoBantumi.serializa().getBytes());
+                    fos.close();
+                } catch (FileNotFoundException e) {
+                    throw new RuntimeException(e);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                Toast toast = new Toast(this);
+                toast.setText("Partida guardada");
+                toast.show();
+                return true;
             case R.id.opcReiniciarPartida:
                 RestartDialog restartDialog = new RestartDialog();
                 restartDialog.show(getSupportFragmentManager(), "ConfirmRestartDialog");
