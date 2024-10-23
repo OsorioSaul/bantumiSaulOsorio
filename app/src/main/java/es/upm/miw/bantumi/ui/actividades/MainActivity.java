@@ -13,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
@@ -23,6 +24,7 @@ import java.util.Locale;
 import es.upm.miw.bantumi.ui.fragmentos.FinalAlertDialog;
 import es.upm.miw.bantumi.R;
 import es.upm.miw.bantumi.dominio.logica.JuegoBantumi;
+import es.upm.miw.bantumi.ui.fragmentos.RestartDialog;
 import es.upm.miw.bantumi.ui.viewmodel.BantumiViewModel;
 
 public class MainActivity extends AppCompatActivity {
@@ -141,6 +143,10 @@ public class MainActivity extends AppCompatActivity {
 
             // @TODO!!! resto opciones
 
+            case R.id.opcReiniciarPartida:
+                RestartDialog restartDialog = new RestartDialog();
+                restartDialog.show(getSupportFragmentManager(), "ConfirmRestartDialog");
+                return true;
             default:
                 Snackbar.make(
                         findViewById(android.R.id.content),
