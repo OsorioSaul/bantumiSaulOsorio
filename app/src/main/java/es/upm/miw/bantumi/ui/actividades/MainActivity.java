@@ -15,9 +15,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.room.Room;
 
 import com.google.android.material.snackbar.Snackbar;
 
@@ -27,7 +27,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import es.upm.miw.bantumi.persistencia.database.AppDatabase;
+import es.upm.miw.bantumi.persistencia.daos.Puntuacion;
 import es.upm.miw.bantumi.ui.fragmentos.FinalAlertDialog;
 import es.upm.miw.bantumi.R;
 import es.upm.miw.bantumi.dominio.logica.JuegoBantumi;
@@ -40,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
     public JuegoBantumi juegoBantumi;
     private BantumiViewModel bantumiVM;
     int numInicialSemillas;
+    AppDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         bantumiVM = new ViewModelProvider(this).get(BantumiViewModel.class);
         juegoBantumi = new JuegoBantumi(bantumiVM, JuegoBantumi.Turno.turnoJ1, numInicialSemillas);
         crearObservadores();
+        db = instanciarBaseDeDatos();
     }
 
     /**
@@ -183,6 +189,8 @@ public class MainActivity extends AppCompatActivity {
                 restartDialog.show(getSupportFragmentManager(), "ConfirmRestartDialog");
                 return true;
 
+            case R.id.opcAjustes:
+
             default:
                 Snackbar.make(
                         findViewById(android.R.id.content),
@@ -193,16 +201,6 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    @NonNull
-    private static StringBuilder leeEstadoDelJuego(BufferedReader fin) throws IOException {
-        StringBuilder estadoDelJuego = new StringBuilder();
-        String linea;
-        while ((linea = fin.readLine()) != null) {
-            estadoDelJuego.append(linea);
-            estadoDelJuego.append('\n');
-        }
-        return estadoDelJuego;
-    }
 
     /**
      * Acción que se ejecuta al pulsar sobre cualquier hueco
@@ -240,10 +238,31 @@ public class MainActivity extends AppCompatActivity {
         if (juegoBantumi.getSemillas(6) == 6 * numInicialSemillas) {
             texto = "¡¡¡ EMPATE !!!";
         }
-
         // @TODO guardar puntuación
-
+        Puntuacion puntuacion = new Puntuacion().fromActualGame(juegoBantumi);
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            db.puntuacionDao().insertAll(puntuacion);
+        });
         // terminar
         new FinalAlertDialog(texto).show(getSupportFragmentManager(), "ALERT_DIALOG");
+    }
+
+    @NonNull
+    private static StringBuilder leeEstadoDelJuego(BufferedReader fin) throws IOException {
+        StringBuilder estadoDelJuego = new StringBuilder();
+        String linea;
+        while ((linea = fin.readLine()) != null) {
+            estadoDelJuego.append(linea);
+            estadoDelJuego.append('\n');
+        }
+        return estadoDelJuego;
+    }
+
+    @NonNull
+    private AppDatabase instanciarBaseDeDatos() {
+        return Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "puntuaciones-db"
+        ).build();
     }
 }
