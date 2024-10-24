@@ -21,9 +21,11 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.snackbar.Snackbar;
 
+import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Locale;
 
 import es.upm.miw.bantumi.ui.fragmentos.FinalAlertDialog;
@@ -114,7 +116,7 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Muestra el valor <i>valor</i> en la posición <i>pos</i>
      *
-     * @param pos posición a actualizar
+     * @param pos   posición a actualizar
      * @param valor valor a mostrar
      */
     private void mostrarValor(int pos, int valor) {
@@ -134,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        Toast toast = new Toast(this);
         switch (item.getItemId()) {
 //            case R.id.opcAjustes: // @todo Preferencias
 //                startActivity(new Intent(this, BantumiPrefs.class));
@@ -149,22 +152,37 @@ public class MainActivity extends AppCompatActivity {
             // @TODO!!! resto opciones
             case R.id.opcGuardarPartida:
                 try {
-                    FileOutputStream fos = openFileOutput("partida.txt", Context.MODE_APPEND);
+                    FileOutputStream fos = openFileOutput("partida.txt", Context.MODE_PRIVATE);
                     fos.write(juegoBantumi.serializa().getBytes());
                     fos.close();
+                    toast.setText("Partida guardada");
+                    toast.show();
                 } catch (FileNotFoundException e) {
                     throw new RuntimeException(e);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-                Toast toast = new Toast(this);
-                toast.setText("Partida guardada");
-                toast.show();
+                return true;
+
+            case R.id.opcRecuperarPartida:
+                try {
+                    BufferedReader fin = new BufferedReader(new InputStreamReader(openFileInput("partida.txt")));
+                    StringBuilder estadoDelJuego = leeEstadoDelJuego(fin);
+                    juegoBantumi.deserializa(estadoDelJuego.toString());
+                    toast.setText("Partida recuperada");
+                    toast.show();
+                } catch (FileNotFoundException e) {
+                    toast.setText("Partida no encontrada");
+                    toast.show();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 return true;
             case R.id.opcReiniciarPartida:
                 RestartDialog restartDialog = new RestartDialog();
                 restartDialog.show(getSupportFragmentManager(), "ConfirmRestartDialog");
                 return true;
+
             default:
                 Snackbar.make(
                         findViewById(android.R.id.content),
@@ -173,6 +191,17 @@ public class MainActivity extends AppCompatActivity {
                 ).show();
         }
         return true;
+    }
+
+    @NonNull
+    private static StringBuilder leeEstadoDelJuego(BufferedReader fin) throws IOException {
+        StringBuilder estadoDelJuego = new StringBuilder();
+        String linea;
+        while ((linea = fin.readLine()) != null) {
+            estadoDelJuego.append(linea);
+            estadoDelJuego.append('\n');
+        }
+        return estadoDelJuego;
     }
 
     /**

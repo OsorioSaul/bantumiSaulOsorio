@@ -218,6 +218,12 @@ public class JuegoBantumi {
      * @param juegoSerializado cadena que representa el estado completo del juego
      */
     public void deserializa(String juegoSerializado) {
-        // @TODO
+        String[] ComponentesJuegoSerializado = juegoSerializado.split("\n");
+        String semillas = ComponentesJuegoSerializado[0];
+        String turno = ComponentesJuegoSerializado[1];
+        for(int i=0; i<NUM_POSICIONES; i++) {
+            setSemillas(i,  semillas.charAt(i)-'0');
+        }
+        bantumiVM.setTurno(Turno.valueOf(turno));
     }
 }
