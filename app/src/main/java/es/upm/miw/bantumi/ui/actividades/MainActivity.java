@@ -239,13 +239,16 @@ public class MainActivity extends AppCompatActivity {
             texto = "¡¡¡ EMPATE !!!";
         }
         // @TODO guardar puntuación
-        Puntuacion puntuacion = new Puntuacion().fromActualGame(juegoBantumi);
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> {
-            db.puntuacionDao().insertAll(puntuacion);
-        });
+        Puntuacion puntuacion = Puntuacion.fromActualGame(juegoBantumi, this);
         // terminar
         new FinalAlertDialog(texto).show(getSupportFragmentManager(), "ALERT_DIALOG");
+        //Guardar puntuación en la base de datos.
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                db.puntuacionDao().insertAll(puntuacion);
+            }
+        }).start();
     }
 
     @NonNull
