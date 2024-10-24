@@ -207,6 +207,7 @@ public class JuegoBantumi {
         StringBuilder estadoDelJuego = new StringBuilder();
         for(int i=0;i<NUM_POSICIONES;i++) {
             estadoDelJuego.append(bantumiVM.getNumSemillas(i).getValue());
+            estadoDelJuego.append(" ");
         }
         estadoDelJuego.append("\n").append(bantumiVM.getTurno().getValue());
         return estadoDelJuego.toString();
@@ -219,10 +220,10 @@ public class JuegoBantumi {
      */
     public void deserializa(String juegoSerializado) {
         String[] ComponentesJuegoSerializado = juegoSerializado.split("\n");
-        String semillas = ComponentesJuegoSerializado[0];
+        String[] semillas = ComponentesJuegoSerializado[0].split(" ");
         String turno = ComponentesJuegoSerializado[1];
         for(int i=0; i<NUM_POSICIONES; i++) {
-            setSemillas(i,  semillas.charAt(i)-'0');
+            setSemillas(i,  Integer.parseInt(semillas[i]));
         }
         bantumiVM.setTurno(Turno.valueOf(turno));
     }
