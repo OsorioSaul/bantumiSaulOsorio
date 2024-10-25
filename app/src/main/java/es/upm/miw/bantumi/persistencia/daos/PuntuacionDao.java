@@ -14,4 +14,17 @@ public interface PuntuacionDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     long[] insertAll(Puntuacion... puntuaciones);
+
+    @Query("SELECT *  \n" +
+            "FROM puntuaciones  \n" +
+            "ORDER BY   \n" +
+            "    CASE   \n" +
+            "        WHEN almacen_jugador_1 > almacen_jugador_2 THEN almacen_jugador_1  \n" +
+            "        ELSE almacen_jugador_2  \n" +
+            "    END DESC  \n" +
+            "LIMIT 10;  ")
+    List<Puntuacion> getTopTenScores();
+
+    @Query("DELETE FROM puntuaciones")
+    void deleteAll();
 }

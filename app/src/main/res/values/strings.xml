@@ -46,5 +46,6 @@
     <!-- Diálogo Final -->
     <string name="txtDialogoFinalTitulo">Fin del juego</string>
     <string name="txtDialogoFinalPregunta">¿Desea jugar otra partida?</string>
+    <string name="eliminar_puntuaciones_guardadas">Eliminar puntuaciones guardadas</string>
 
 </resources>

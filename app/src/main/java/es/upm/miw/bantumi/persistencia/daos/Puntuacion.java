@@ -75,6 +75,25 @@ public class Puntuacion {
         this.fecha = fecha;
     }
 
+    @Override
+    public String toString() {
+        return "Puntuacion{" +
+                "sId=" + sId +
+                ", nombreDelJugador='" + nombreDelJugador + '\'' +
+                ", almacenJugador1=" + almacenJugador1 +
+                ", almacenJugador2=" + almacenJugador2 +
+                ", fecha=" + fecha +
+                '}';
+    }
+
+    public String toStilizedString() {
+        return ", Jugador: '" + nombreDelJugador + '\'' +
+                ", Almacen del jugador 1: " + almacenJugador1 +
+                ", Almacen del jugador 2: " + almacenJugador2 +
+                ", fecha: " + fecha +
+                '}';
+    }
+
     public static Puntuacion fromActualGame(JuegoBantumi actualGame, Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         String nombreDelJugador = preferences.getString("nombreJugador", "Jugador1");

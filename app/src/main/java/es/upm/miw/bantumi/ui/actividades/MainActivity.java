@@ -2,6 +2,7 @@ package es.upm.miw.bantumi.ui.actividades;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -26,6 +27,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -135,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.opciones_menu, menu);
@@ -189,7 +192,9 @@ public class MainActivity extends AppCompatActivity {
                 restartDialog.show(getSupportFragmentManager(), "ConfirmRestartDialog");
                 return true;
 
-            case R.id.opcAjustes:
+            case R.id.opcMejoresResultados:
+                desplegarMejoresResultados();
+                return true;
 
             default:
                 Snackbar.make(
@@ -200,6 +205,7 @@ public class MainActivity extends AppCompatActivity {
         }
         return true;
     }
+
 
 
     /**
@@ -267,5 +273,21 @@ public class MainActivity extends AppCompatActivity {
         return Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "puntuaciones-db"
         ).build();
+    }
+
+    private void desplegarMejoresResultados() {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        executor.execute(() -> {
+            List<Puntuacion> puntuaciones = db.puntuacionDao().getTopTenScores();
+            runOnUiThread(() -> {
+                String[] renglonDePuntuaciones = new String[puntuaciones.size()];
+                for (int i = 0; i < puntuaciones.size(); i++) {
+                    renglonDePuntuaciones[i] = puntuaciones.get(i).toStilizedString();
+                }
+                Intent intent = new Intent(MainActivity.this, MejoresResultadosActivity.class);
+                intent.putExtra("puntuaciones", renglonDePuntuaciones);
+                startActivity(intent);
+            });
+        });
     }
 }
